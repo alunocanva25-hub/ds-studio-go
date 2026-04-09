@@ -1,10 +1,13 @@
-## DS STUDIO GO v2.1
+## DS STUDIO GO v2.2
 
-Correção de navegação para Streamlit Cloud: substituído `st.page_link()` por `st.switch_page()` com botões.
+Versão corrigida para evitar os erros de atalhos e navegação no Streamlit Cloud.
 
-# DS STUDIO GO — V2
-
-Versão inicial premium do app mobile do DSYSTEM, feita em Streamlit para validação rápida.
+### O que mudou nesta versão
+- removida a dependência de multipage com `st.page_link()` e `st.switch_page()`
+- agora toda a navegação acontece dentro de um único `app.py`
+- atalhos da home levam para as telas sem quebrar no Streamlit Cloud
+- adicionados botões de voltar
+- adicionada navegação inferior estilo app
 
 ## Módulos
 - Login
@@ -28,52 +31,13 @@ streamlit run app.py
 3. Escolha `app.py` como arquivo principal.
 
 ## Como sincronizar com o DSYSTEM de verdade
-Esta V2 usa SQLite local apenas para demonstração.
+Esta versão continua usando SQLite local apenas para demonstração.
 
-O caminho correto para sincronizar com o banco do DSYSTEM é:
+Fluxo profissional recomendado:
 
-### Opção recomendada
-**DS STUDIO GO (mobile) -> API segura -> Banco do DSYSTEM**
+**DS STUDIO GO -> API segura -> Banco do DSYSTEM**
 
-Não é recomendado conectar o app mobile direto no banco principal.
-
-### Fluxo ideal
-1. O app envia login, agendamento e financeiro para uma API.
-2. A API valida usuário, permissões e dados.
-3. A API grava e consulta no banco oficial do DSYSTEM.
-4. O app exibe o retorno já tratado.
-
-### Por que isso é melhor
-- mais segurança
-- menos risco de corromper o banco
-- regras centralizadas
-- auditoria mais fácil
-- evolução futura mais organizada
-
-### Fases práticas
-#### Fase 1
-Demo local com SQLite.
-
-#### Fase 2
-Criar API em Flask ou FastAPI com rotas como:
-- POST /login
-- GET /agenda/hoje
-- POST /agenda
-- GET /financeiro/hoje
-- POST /financeiro
-
-#### Fase 3
-Conectar a API ao banco real do DSYSTEM.
-
-#### Fase 4
-Publicar o mobile apontando para a API oficial.
-
-## Onde alocar
-### GitHub
-Guardar código, versionar e atualizar.
-
-### Streamlit Cloud
-Publicar a V2 para testes e validação visual.
-
-### Produção real
-Quando for integrar de verdade ao banco principal, o ideal é hospedar a **API** em um servidor próprio/VPS/Render/Railway e deixar o Streamlit ou frontend consumindo essa API.
+- o app envia login, agendamento e financeiro para uma API
+- a API valida usuário, permissões e regras
+- a API consulta ou grava no banco oficial do DSYSTEM
+- o app exibe o retorno já tratado
