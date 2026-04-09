@@ -43,11 +43,14 @@ with col4:
 st.markdown("### Atalhos")
 shortcut1, shortcut2, shortcut3 = st.columns(3)
 with shortcut1:
-    st.page_link("pages/1_Agenda.py", label="Novo agendamento", icon="📅")
+    if st.button("📅 Novo agendamento", use_container_width=True, key="go_agenda"):
+        st.switch_page("pages/1_Agenda.py")
 with shortcut2:
-    st.page_link("pages/2_Financeiro.py", label="Novo lançamento", icon="💸")
+    if st.button("💸 Novo lançamento", use_container_width=True, key="go_financeiro"):
+        st.switch_page("pages/2_Financeiro.py")
 with shortcut3:
-    st.page_link("pages/3_Resumo_do_Dia.py", label="Resumo do dia", icon="📊")
+    if st.button("📊 Resumo do dia", use_container_width=True, key="go_resumo"):
+        st.switch_page("pages/3_Resumo_do_Dia.py")
 
 st.markdown("### Próximos agendamentos")
 if summary["next_schedules"]:

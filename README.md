@@ -1,3 +1,7 @@
+## DS STUDIO GO v2.1
+
+Correção de navegação para Streamlit Cloud: substituído `st.page_link()` por `st.switch_page()` com botões.
+
 # DS STUDIO GO — V2
 
 Versão inicial premium do app mobile do DSYSTEM, feita em Streamlit para validação rápida.
