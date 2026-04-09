@@ -7,6 +7,7 @@ from utils.db import validate_user
 def init_session() -> None:
     st.session_state.setdefault("logged_in", False)
     st.session_state.setdefault("user", None)
+    st.session_state.setdefault("current_view", "home")
 
 
 def login_box() -> None:
@@ -22,13 +23,14 @@ def login_box() -> None:
         if user:
             st.session_state.logged_in = True
             st.session_state.user = user
+            st.session_state.current_view = "home"
             st.rerun()
         st.error("Usuário ou senha inválidos.")
 
 
 def require_login() -> None:
     if not st.session_state.get("logged_in"):
-        st.switch_page("app.py")
+        st.stop()
 
 
 def current_user() -> dict:
@@ -39,4 +41,5 @@ def logout_button() -> None:
     if st.button("Sair", use_container_width=True):
         st.session_state.logged_in = False
         st.session_state.user = None
+        st.session_state.current_view = "home"
         st.rerun()

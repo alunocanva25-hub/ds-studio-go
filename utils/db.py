@@ -11,13 +11,13 @@ DB_PATH = DATA_DIR / "ds_studio_go.db"
 
 
 def connect() -> sqlite3.Connection:
+    os.makedirs(DATA_DIR, exist_ok=True)
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 
 
 def init_db() -> None:
-    os.makedirs(DATA_DIR, exist_ok=True)
     conn = connect()
     cur = conn.cursor()
     cur.execute(
@@ -58,7 +58,6 @@ def init_db() -> None:
         )
         """
     )
-
     cur.execute("SELECT COUNT(*) AS total FROM users")
     if cur.fetchone()["total"] == 0:
         cur.executemany(
@@ -77,7 +76,7 @@ def validate_user(username: str, password: str):
     cur = conn.cursor()
     cur.execute(
         "SELECT id, username, display_name, role FROM users WHERE username = ? AND password = ?",
-        (username, password),
+        (username.strip(), password),
     )
     row = cur.fetchone()
     conn.close()
@@ -88,7 +87,7 @@ def add_schedule(client: str, service: str, professional: str, dt: str, tm: str,
     conn = connect()
     conn.execute(
         "INSERT INTO schedules (client, service, professional, date, time, notes) VALUES (?, ?, ?, ?, ?, ?)",
-        (client, service, professional, dt, tm, notes),
+        (client.strip(), service.strip(), professional.strip(), dt, tm, notes.strip()),
     )
     conn.commit()
     conn.close()
@@ -97,7 +96,7 @@ def add_schedule(client: str, service: str, professional: str, dt: str, tm: str,
 def list_schedules(limit: int = 50):
     conn = connect()
     rows = conn.execute(
-        "SELECT * FROM schedules ORDER BY date ASC, time ASC LIMIT ?",
+        "SELECT * FROM schedules ORDER BY date ASC, time ASC, id DESC LIMIT ?",
         (limit,),
     ).fetchall()
     conn.close()
@@ -115,7 +114,7 @@ def add_financial_entry(entry_type: str, description: str, amount: float, paymen
     conn = connect()
     conn.execute(
         "INSERT INTO financial_entries (type, description, amount, payment_method, date, notes) VALUES (?, ?, ?, ?, ?, ?)",
-        (entry_type, description, amount, payment_method, dt, notes),
+        (entry_type, description.strip(), float(amount), payment_method, dt, notes.strip()),
     )
     conn.commit()
     conn.close()
@@ -147,13 +146,17 @@ def get_dashboard_summary() -> dict:
         (today,),
     ).fetchone()["total"]
     next_schedules = conn.execute(
-        "SELECT * FROM schedules ORDER BY date ASC, time ASC LIMIT 5"
+        "SELECT * FROM schedules ORDER BY date ASC, time ASC, id DESC LIMIT 5"
+    ).fetchall()
+    latest_entries = conn.execute(
+        "SELECT * FROM financial_entries ORDER BY date DESC, id DESC LIMIT 5"
     ).fetchall()
     conn.close()
     return {
-        "today_schedule_count": today_schedule_count,
+        "today_schedule_count": int(today_schedule_count or 0),
         "received_today": float(received_today or 0),
         "expense_today": float(expense_today or 0),
         "balance_today": float((received_today or 0) - (expense_today or 0)),
         "next_schedules": [dict(r) for r in next_schedules],
+        "latest_entries": [dict(r) for r in latest_entries],
     }
